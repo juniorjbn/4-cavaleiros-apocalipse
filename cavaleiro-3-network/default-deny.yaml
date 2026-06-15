@@ -1,0 +1,14 @@
+# Cavaleiro 3 — defesa, parte 1: NEGAR TUDO.
+# Bloqueia todo o trafego de entrada e saida de TODOS os pods do namespace.
+# E o ponto de partida do Zero Trust dentro do cluster: nada conversa com nada
+# ate ser explicitamente liberado.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: c3-network
+spec:
+  podSelector: {}                 # todos os pods do namespace
+  policyTypes:
+    - Ingress
+    - Egress

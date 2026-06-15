@@ -1,0 +1,21 @@
+# Cavaleiro 1 — o "deploy do atacante". A imagem vem do registry interno
+# (kind-registry:5001) e NAO esta assinada. Sem politica de admissao, sobe sem
+# nenhuma friccao: voce mesmo faz o deploy do atacante.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-suspeito
+  namespace: c1-supply-chain
+  labels: { demo: cavaleiro-1 }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: app-suspeito }
+  template:
+    metadata:
+      labels: { app: app-suspeito }
+    spec:
+      containers:
+        - name: app
+          image: kind-registry:5111/cavaleiro1:suspeita
+          imagePullPolicy: IfNotPresent

@@ -1,0 +1,25 @@
+# Cluster kind para as demos dos "4 Cavaleiros do Apocalipse no Kubernetes".
+#
+# Duas escolhas importantes aqui:
+#   1. disableDefaultCNI: true  -> o CNI padrao do kind (kindnet) NAO aplica
+#      NetworkPolicy. Sem isso, o Cavaleiro 3 "aplica" a policy mas nada e
+#      bloqueado. Trocamos o kindnet pelo Calico (instalado no setup.sh).
+#   2. podSubnet 192.168.0.0/16 -> bate com o IPPool padrao do manifesto do
+#      Calico, evitando configuracao extra.
+#
+# A node image esta fixada por digest para reprodutibilidade (testado com
+# kind v0.31 / Kubernetes v1.35).
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  disableDefaultCNI: true
+  podSubnet: "192.168.0.0/16"
+# Habilita o diretorio de configuracao de registries do containerd (certs.d),
+# usado para apontar o registry local kind-registry:5001 via HTTP.
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f

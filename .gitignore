@@ -1,0 +1,13 @@
+# Chaves do cosign geradas durante o Cavaleiro 1 (NUNCA versionar a privada)
+cosign.key
+cosign.pub
+*.key
+
+# Artefatos gerados pelos scanners durante a demo
+*.sbom.json
+sbom-*.json
+*.cdx.json
+*.spdx.json
+
+# Sistema
+.DS_Store

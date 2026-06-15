@@ -1,0 +1,13 @@
+# Cavaleiro 2 — defesa. Pod Security Standards no nivel "restricted", aplicado
+# como labels no namespace. A partir daqui, pods privilegiados, com hostPath ou
+# rodando como root sao REJEITADOS na criacao pelo Pod Security Admission
+# (nativo do Kubernetes, sem instalar nada).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c2-privileged
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

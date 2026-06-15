@@ -1,0 +1,40 @@
+# Cavaleiro 3 — defesa, parte 2: liberar SO o necessario (least privilege).
+#   (a) frontend pode resolver DNS e falar com o payments-db na porta 8080.
+#   (b) payments-db aceita conexao APENAS do frontend, na 8080.
+# Movimentacao lateral para qualquer outro destino continua bloqueada.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-egress
+  namespace: c3-network
+spec:
+  podSelector:
+    matchLabels: { app: frontend }
+  policyTypes: [Egress]
+  egress:
+    # acesso legitimo ao banco
+    - to:
+        - podSelector:
+            matchLabels: { app: payments-db }
+      ports:
+        - { protocol: TCP, port: 8080 }
+    # DNS (necessario para resolver o nome do servico)
+    - ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-ingress
+  namespace: c3-network
+spec:
+  podSelector:
+    matchLabels: { app: payments-db }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: frontend }
+      ports:
+        - { protocol: TCP, port: 8080 }
