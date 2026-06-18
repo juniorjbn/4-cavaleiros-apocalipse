@@ -17,7 +17,7 @@ REG_NAME="${REG_NAME:-kind-registry}"
 REG_PORT="${REG_PORT:-5111}"
 CALICO_VERSION="${CALICO_VERSION:-v3.32.0}"
 KYVERNO_CHART_VERSION="${KYVERNO_CHART_VERSION:-3.8.1}"
-DEMO_IMAGES=(alpine:3.20 hashicorp/http-echo:1.0)
+DEMO_IMAGES=(alpine:3.20 hashicorp/http-echo:1.0 curlimages/curl:8.10.1)
 
 log() { printf '\n\033[1m>> %s\033[0m\n' "$*"; }
 
@@ -120,4 +120,4 @@ for ns in c1-supply-chain c2-privileged c3-network c4-secrets; do
   kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply -f -
 done
 
-log "setup completo. Cluster '${CLUSTER_NAME}' pronto para os 4 cavaleiros."
+log "setup completo. Cluster '${CLUSTER_NAME}' pronto para o apocalipse!"

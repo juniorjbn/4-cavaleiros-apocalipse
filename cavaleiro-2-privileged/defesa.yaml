@@ -1,0 +1,12 @@
+# Cavaleiro 2 — defesa: least privilege. O app nao precisa CRIAR pods, so
+# listar. Reaplicamos o mesmo Role SEM o verbo "create". O token continua
+# valido, mas a acao perigosa (criar pod) passa a ser negada.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-role
+  namespace: c2-privileged
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]          # <-- "create" removido

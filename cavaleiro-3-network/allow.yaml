@@ -1,7 +1,10 @@
-# Cavaleiro 3 — defesa, parte 2: liberar SO o necessario (least privilege).
-#   (a) frontend pode resolver DNS e falar com o payments-db na porta 8080.
-#   (b) payments-db aceita conexao APENAS do frontend, na 8080.
-# Movimentacao lateral para qualquer outro destino continua bloqueada.
+# Cavaleiro 3 — defesa: segmentacao por camada (least privilege de rede).
+# Depois disto:
+#   - frontend SO fala com o backend (e DNS).
+#   - backend fala com o db (e DNS), e aceita conexao do frontend.
+#   - db aceita SO do backend.
+# O frontend (comprometido) fica cortado do banco PARA SEMPRE — quem chega no
+# banco e apenas o backend.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -9,19 +12,52 @@ metadata:
   namespace: c3-network
 spec:
   podSelector:
-    matchLabels: { app: frontend }
+    matchLabels: { tier: frontend }
   policyTypes: [Egress]
   egress:
-    # acesso legitimo ao banco
     - to:
         - podSelector:
-            matchLabels: { app: payments-db }
+            matchLabels: { tier: backend }
       ports:
         - { protocol: TCP, port: 8080 }
-    # DNS (necessario para resolver o nome do servico)
-    - ports:
+    - ports:                       # DNS
         - { protocol: UDP, port: 53 }
         - { protocol: TCP, port: 53 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-egress
+  namespace: c3-network
+spec:
+  podSelector:
+    matchLabels: { tier: backend }
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: { tier: db }
+      ports:
+        - { protocol: TCP, port: 8080 }
+    - ports:                       # DNS
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-ingress
+  namespace: c3-network
+spec:
+  podSelector:
+    matchLabels: { tier: backend }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { tier: frontend }
+      ports:
+        - { protocol: TCP, port: 8080 }
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -30,11 +66,11 @@ metadata:
   namespace: c3-network
 spec:
   podSelector:
-    matchLabels: { app: payments-db }
+    matchLabels: { tier: db }
   policyTypes: [Ingress]
   ingress:
     - from:
         - podSelector:
-            matchLabels: { app: frontend }
+            matchLabels: { tier: backend }   # SO o backend; o frontend nao entra
       ports:
         - { protocol: TCP, port: 8080 }

