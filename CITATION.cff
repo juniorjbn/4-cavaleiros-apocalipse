@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: Os 4 Cavaleiros do Apocalipse no Kubernetes
+message: >-
+  Se você usar este material (palestra, demos ou roteiros),
+  por favor cite conforme abaixo.
+type: software
+authors:
+  - given-names: João
+    family-names: Brito
+    alias: juniorjbn
+repository-code: https://github.com/juniorjbn/4-cavaleiros-apocalipse
+url: https://github.com/juniorjbn/4-cavaleiros-apocalipse
+license: CC-BY-4.0
+date-released: "2026-06-19"
+version: "1.0.0"
+keywords:
+  - kubernetes
+  - security
+  - supply-chain
+  - rbac
+  - network-policy
+  - secrets
+  - vault

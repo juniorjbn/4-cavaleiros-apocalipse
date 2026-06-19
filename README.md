@@ -58,3 +58,14 @@ são **fictícias**. Vault em dev-mode, registry HTTP e token `root` são apenas
 
 > O registry local usa a porta **5111** (para não colidir com a 5000/5001). Para trocar, ajuste
 > `REG_PORT` no `demo/setup.sh` e as referências `:5111` nos arquivos do Cavaleiro 1.
+
+## Licença e como citar
+
+Material sob **[CC BY 4.0](LICENSE)** — você pode usar, adaptar e compartilhar (inclusive
+comercialmente), **desde que dê o crédito**.
+
+Se usar numa palestra, post ou adaptação, cite:
+
+> João Brito (@juniorjbn). *Os 4 Cavaleiros do Apocalipse no Kubernetes*, 2026. https://github.com/juniorjbn/4-cavaleiros-apocalipse
+
+O GitHub também exibe um botão **"Cite this repository"**, gerado a partir do [`CITATION.cff`](CITATION.cff).
