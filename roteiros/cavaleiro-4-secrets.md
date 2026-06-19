@@ -66,4 +66,4 @@ kubectl -n c4-secrets delete secret vault-token db-credentials-managed --ignore-
 
 ---
 
-[I · Entrar](cavaleiro-1-supply-chain.md) · [II · Executar](cavaleiro-2-privileged.md) · [III · Movimentar](cavaleiro-3-network.md) · **IV · Roubar** — [Material de apoio](../explicacao-4-cavaleiros.md)
+[I · Entrar](cavaleiro-1-supply-chain.md) · [II · Executar](cavaleiro-2-privileged.md) · [III · Movimentar](cavaleiro-3-network.md) · **IV · Roubar**

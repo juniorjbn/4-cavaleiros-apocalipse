@@ -89,4 +89,4 @@ kubectl delete -f pod-privilegiado.yaml -f cenario.yaml --ignore-not-found
 
 ---
 
-[I · Entrar](cavaleiro-1-supply-chain.md) · **II · Executar** · [III · Movimentar](cavaleiro-3-network.md) · [IV · Roubar](cavaleiro-4-secrets.md) — [Material de apoio](../explicacao-4-cavaleiros.md)
+[I · Entrar](cavaleiro-1-supply-chain.md) · **II · Executar** · [III · Movimentar](cavaleiro-3-network.md) · [IV · Roubar](cavaleiro-4-secrets.md)

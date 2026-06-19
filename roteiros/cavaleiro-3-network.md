@@ -70,4 +70,4 @@ kubectl delete -f allow.yaml -f default-deny.yaml -f app.yaml --ignore-not-found
 
 ---
 
-[I · Entrar](cavaleiro-1-supply-chain.md) · [II · Executar](cavaleiro-2-privileged.md) · **III · Movimentar** · [IV · Roubar](cavaleiro-4-secrets.md) — [Material de apoio](../explicacao-4-cavaleiros.md)
+[I · Entrar](cavaleiro-1-supply-chain.md) · [II · Executar](cavaleiro-2-privileged.md) · **III · Movimentar** · [IV · Roubar](cavaleiro-4-secrets.md)

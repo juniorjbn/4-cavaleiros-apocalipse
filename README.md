@@ -13,10 +13,9 @@ num cluster local.
 
 ## Material de apoio
 
-- **[explicacao-4-cavaleiros.md](explicacao-4-cavaleiros.md)** — a visão completa de cada cavaleiro: cenários reais, como o ataque funciona, defesa em camadas e as perguntas que a plateia faz.
 - **[roteiros/](roteiros/)** — o roteiro de palco de cada demo, com os comandos prontos para copiar.
 
-> Cada material tem duas versões: o **`.md`** renderiza direto aqui no GitHub; o **`.html`** é a versão de palco (alto contraste, botão de copiar comando) para abrir no navegador durante a apresentação.
+> Cada roteiro tem duas versões: o **`.md`** renderiza direto aqui no GitHub; o **`.html`** é a versão de palco (alto contraste, botão de copiar comando) para abrir no navegador durante a apresentação.
 
 ## Rodar as demos
 
@@ -37,8 +36,6 @@ Depois do `setup.sh`, **as demos rodam offline**.
 
 ```
 README.md                       você está aqui
-explicacao-4-cavaleiros.md      material de apoio — visão geral (renderiza no GitHub)
-explicacao-4-cavaleiros.html    a mesma visão geral, versão de palco (navegador)
 roteiros/                       os 4 roteiros — .md (GitHub) + .html (palco)
 demo/                           tudo que é executável
   setup.sh · teardown.sh

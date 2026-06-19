@@ -69,4 +69,4 @@ rm -f cosign.key cosign.pub
 
 ---
 
-**I · Entrar** · [II · Executar](cavaleiro-2-privileged.md) · [III · Movimentar](cavaleiro-3-network.md) · [IV · Roubar](cavaleiro-4-secrets.md) — [Material de apoio](../explicacao-4-cavaleiros.md)
+**I · Entrar** · [II · Executar](cavaleiro-2-privileged.md) · [III · Movimentar](cavaleiro-3-network.md) · [IV · Roubar](cavaleiro-4-secrets.md)
