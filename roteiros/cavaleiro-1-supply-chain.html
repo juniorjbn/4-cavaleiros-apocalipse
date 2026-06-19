@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roteiro · Cavaleiro 1 — Supply Chain</title>
+<style>
+  :root{
+    --bg:#0d0d0f; --surface:#161619; --surface2:#1d1d22; --border:#2a2a31;
+    --text:#ededf0; --muted:#9a9aa6; --bright:#ffffff; --cmd-bg:#08080a;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px 120px}
+  /* top nav */
+  nav.top{position:sticky;top:0;background:rgba(13,13,15,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);display:flex;gap:4px;align-items:center;
+    padding:10px 24px;margin:0 -24px 40px;font-size:13px;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:6px;letter-spacing:.02em}
+  nav.top a:hover{color:var(--bright);background:var(--surface2)}
+  nav.top a.here{color:var(--bright);background:var(--surface2);font-weight:600}
+  nav.top .sep{flex:1}
+  /* header */
+  header{padding:32px 0 28px;border-bottom:1px solid var(--border);margin-bottom:36px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:34px;line-height:1.15;margin:14px 0 6px;letter-spacing:-.01em}
+  .roman{font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .tagline{font-size:17px;color:var(--muted);font-style:italic;margin-top:18px;
+    border-left:2px solid var(--border);padding-left:16px}
+  .cwd{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:22px;
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+  .cwd b{color:var(--text)}
+  /* steps */
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:22px 24px;margin:18px 0}
+  .step-h{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+  .num{font-family:var(--mono);font-size:14px;color:var(--bg);background:var(--text);
+    min-width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;
+    justify-content:center;font-weight:700;flex-shrink:0;transform:translateY(3px)}
+  .step h2{font-size:19px;margin:0;font-weight:600;letter-spacing:-.01em}
+  .say{margin:12px 0 14px;color:#cfcfd6;font-style:italic;font-size:15.5px;
+    border-left:2px solid #3a3a44;padding:2px 0 2px 16px}
+  .say::before{content:"";font-style:normal;opacity:.5}
+  /* command block */
+  .cmd{position:relative;background:var(--cmd-bg);border:1px solid var(--border);
+    border-radius:10px;margin:12px 0}
+  .cmd pre{margin:0;padding:16px 18px;overflow-x:auto;font-family:var(--mono);
+    font-size:14.5px;line-height:1.7}
+  .cmd code{color:#eaeaf0;white-space:pre}
+  .cmd .prompt{color:var(--muted);user-select:none}
+  .copy{position:absolute;top:9px;right:9px;background:var(--surface2);color:var(--muted);
+    border:1px solid var(--border);border-radius:7px;padding:5px 11px;font-size:12px;
+    font-family:var(--mono);cursor:pointer;transition:.15s}
+  .copy:hover{color:var(--bright);border-color:#444}
+  .expect{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:14.5px;margin:12px 2px 0}
+  .expect .ic{font-family:var(--mono);color:var(--text);flex-shrink:0}
+  .expect b{color:var(--text);font-weight:600}
+  .punch{border-color:#4a4a55}
+  .punch .num{background:var(--bright)}
+  /* reset */
+  .reset{margin-top:40px;border:1px dashed var(--border);border-radius:12px;padding:20px 24px;background:#101013}
+  .reset h3{margin:0 0 6px;font-size:15px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  /* footer nav */
+  .fnav{display:flex;justify-content:space-between;margin-top:48px;gap:12px;font-size:14px}
+  .fnav a{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:10px 16px;transition:.15s}
+  .fnav a:hover{color:var(--bright);border-color:#444}
+  @media(max-width:600px){h1{font-size:27px}.wrap{padding:0 16px 80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="cavaleiro-1-supply-chain.html" class="here">I · Entrar</a>
+    <a href="cavaleiro-2-privileged.html">II · Executar</a>
+    <a href="cavaleiro-3-network.html">III · Movimentar</a>
+    <a href="cavaleiro-4-secrets.html">IV · Roubar</a>
+    <span class="sep"></span>
+    <a href="../explicacao-4-cavaleiros.html">↳ Explicação</a>
+  </nav>
+
+  <header>
+    <div class="kicker">Cavaleiro I — Entrar</div>
+    <h1>Supply Chain</h1>
+    <div class="roman">Cosign · SBOM · Kyverno</div>
+    <div class="tagline">"O invasor não precisa invadir seu cluster se você fizer o deploy dele."</div>
+    <div class="cwd">Rode a partir de: <b>demo/cavaleiro-1-supply-chain/</b> &nbsp;·&nbsp; pré-requisito: <b>./setup.sh</b> já executado</div>
+  </header>
+
+  <section class="step">
+    <div class="step-h"><span class="num">1</span><h2>O deploy do atacante sobe sem fricção</h2></div>
+    <blockquote class="say">"Ninguém invadiu nada. Fui eu que fiz o deploy. A imagem tinha um nome amigável, e o cluster confiou."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl apply -f deploy.yaml
+kubectl -n c1-supply-chain get pods -w</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>O pod sobe <b>sem nenhuma verificação</b> de origem ou integridade.</span></p>
+  </section>
+
+  <section class="step">
+    <div class="step-h"><span class="num">2</span><h2>O que tem dentro da imagem?</h2></div>
+    <blockquote class="say">"Nem toda imagem pública é open source. Algumas são open doors."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>trivy image --scanners secret localhost:5111/cavaleiro1:suspeita</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>O trivy aponta <b>3 segredos CRITICAL</b> plantados na imagem (credenciais AWS + token GitHub).</span></p>
+  </section>
+
+  <section class="step">
+    <div class="step-h"><span class="num">3</span><h2>A fronteira de confiança: a assinatura</h2></div>
+    <blockquote class="say">"A confiança não pode ser o nome da imagem. Tem que ser uma assinatura criptográfica."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>COSIGN_PASSWORD="" cosign generate-key-pair</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>Gera <b>cosign.key</b> (privada) e <b>cosign.pub</b> (pública).</span></p>
+  </section>
+
+  <section class="step">
+    <div class="step-h"><span class="num">4</span><h2>Liga a exigência de assinatura (Kyverno)</h2></div>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>./apply-policy.sh</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>Uma <b>ClusterPolicy</b> passa a exigir assinatura Cosign para a imagem.</span></p>
+  </section>
+
+  <section class="step punch">
+    <div class="step-h"><span class="num">5</span><h2>Tenta subir a imagem NÃO assinada → bloqueado</h2></div>
+    <blockquote class="say">"A política não julga se a imagem é boa. Ela exige que alguém de confiança tenha assinado. Sem assinatura, não entra."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl delete -f deploy.yaml
+kubectl apply -f deploy.yaml</code></pre></div>
+    <p class="expect"><span class="ic">✗</span> <span><b>admission webhook denied the request</b> — imagem sem assinatura válida.</span></p>
+  </section>
+
+  <section class="step punch">
+    <div class="step-h"><span class="num">6</span><h2>Assina a imagem e sobe de novo → passa</h2></div>
+    <blockquote class="say">"A mesma imagem, agora assinada, é admitida. O malware moderno chega por CI/CD — e é ali que a gente coloca a assinatura."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>./sign.sh
+kubectl apply -f deploy.yaml
+kubectl -n c1-supply-chain get pods -w</code></pre></div>
+    <p class="expect"><span class="ic">✓</span> <span>O pod sobe: imagem <b>assinada e verificada</b> na admissão.</span></p>
+  </section>
+
+  <div class="reset">
+    <h3>Reset</h3>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl delete -f deploy.yaml --ignore-not-found
+kubectl delete clusterpolicy exigir-assinatura-cavaleiro1 --ignore-not-found
+rm -f cosign.key cosign.pub</code></pre></div>
+  </div>
+
+  <div class="fnav">
+    <a href="../explicacao-4-cavaleiros.html">↳ Material de apoio</a>
+    <a href="cavaleiro-2-privileged.html">Cavaleiro II · Executar →</a>
+  </div>
+</div>
+
+<script>
+function copyCmd(btn){
+  const code = btn.parentElement.querySelector('code');
+  const text = code.innerText.replace(/^\s*\$\s?/gm,'').trim();
+  const done=()=>{const t=btn.textContent;btn.textContent='copiado ✓';setTimeout(()=>btn.textContent=t,1200);};
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  }else{fallbackCopy(text,done);}
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.top='-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');done();}catch(e){}
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>

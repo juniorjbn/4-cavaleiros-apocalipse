@@ -1,76 +1,60 @@
-# Os 4 Cavaleiros do Apocalipse no Kubernetes — Demos
+# Os 4 Cavaleiros do Apocalipse no Kubernetes
 
-Demos executáveis da palestra **"Os 4 Cavaleiros do Apocalipse no Kubernetes"**.
-Cada cavaleiro é uma etapa de um ataque real — e a defesa correspondente, rodando ao vivo num cluster local.
+Material e demos da palestra **"Os 4 Cavaleiros do Apocalipse no Kubernetes"** — a jornada de um
+ataque (**Entrar → Executar → Movimentar → Roubar**) e a defesa de cada etapa, rodando ao vivo
+num cluster local.
 
-| # | Cavaleiro | Ataque | Defesa |
-|---|-----------|--------|--------|
-| I   | [Entrar](cavaleiro-1-supply-chain/)    | Supply chain (imagem não confiável) | Cosign + SBOM + Kyverno |
-| II  | [Executar](cavaleiro-2-privileged/)    | Container privilegiado / hostPath   | Pod Security Standards |
-| III | [Movimentar](cavaleiro-3-network/)     | Movimentação lateral                | Network Policies (Calico) |
-| IV  | [Roubar](cavaleiro-4-secrets/)         | Secrets em base64                   | Vault + External Secrets Operator |
+| # | Cavaleiro | Ataque | Defesa | Roteiro |
+|---|-----------|--------|--------|---------|
+| I   | Entrar     | Supply chain (imagem não confiável)   | Cosign + SBOM + Kyverno      | [▶](roteiros/cavaleiro-1-supply-chain.html) |
+| II  | Executar   | Token de ServiceAccount + RBAC        | RBAC mínimo                  | [▶](roteiros/cavaleiro-2-privileged.html) |
+| III | Movimentar | Movimentação lateral (rede plana)     | Network Policies (3 camadas) | [▶](roteiros/cavaleiro-3-network.html) |
+| IV  | Roubar     | Secrets em base64                     | Vault + External Secrets     | [▶](roteiros/cavaleiro-4-secrets.html) |
 
-> **Aviso.** Tudo aqui é um **laboratório efêmero e local** (kind). As "imagens maliciosas" são **benignas** — apenas imitam atividade suspeita em logs e carregam um segredo plantado para o scanner achar. Nada conecta na internet, minera ou causa dano. Não use nenhuma destas configurações (registry HTTP, Vault dev-mode, token `root`) em produção.
+## Material de apoio
 
----
+- **[explicacao-4-cavaleiros.html](explicacao-4-cavaleiros.html)** — a visão completa de cada cavaleiro: cenários reais, como o ataque funciona, defesa em camadas e as perguntas que a plateia faz.
+- **[roteiros/](roteiros/)** — o roteiro de palco de cada demo, com os comandos prontos para copiar.
 
-## Pré-requisitos
+> Os arquivos de apoio são **HTML**. No GitHub eles aparecem como código-fonte; para ver renderizado, **clone o repositório e abra no navegador** (ou use a extensão de preview do seu editor).
 
-| Ferramenta | Para quê | Testado com |
-|---|---|---|
-| [Docker](https://docs.docker.com/get-docker/) | roda o kind e o registry | — |
-| [kind](https://kind.sigs.k8s.io/) | cluster local | v0.31 |
-| [kubectl](https://kubernetes.io/docs/tasks/tools/) | falar com o cluster | v1.35 |
-| [helm](https://helm.sh/) | instalar Kyverno/ESO/Vault | v3 |
-| [cosign](https://docs.sigstore.dev/cosign/installation/) | assinar imagens (Cavaleiro 1) | v2 |
-| [trivy](https://aquasecurity.github.io/trivy/) | scan/SBOM (Cavaleiro 1) | — |
+## Rodar as demos
 
-Verifique de uma vez:
+Pré-requisitos: **Docker, kind, kubectl, helm, cosign, trivy** (testado com kind v0.31 / Kubernetes v1.35).
+
 ```bash
-for t in docker kind kubectl helm cosign trivy; do command -v $t >/dev/null && echo "$t ok" || echo "$t FALTANDO"; done
+cd demo
+./setup.sh              # cria o cluster kind + Calico + registry e instala Kyverno/ESO/Vault
+                        # rode ANTES da palestra (precisa de internet)
+# ... siga os roteiros em roteiros/*.html ...
+./scripts/validate.sh   # opcional: roda as 4 demos de ponta a ponta (cold-run)
+./teardown.sh           # derruba o cluster e o registry
 ```
 
-## Subir o ambiente
-```bash
-./setup.sh
-```
-Cria o cluster kind (com Calico), o registry local, e instala Kyverno, External Secrets Operator e Vault.
-Rode **antes** da palestra (precisa de internet). Depois disso, as demos rodam offline.
-
-## Derrubar tudo
-```bash
-./teardown.sh
-```
-
-## Validar as 4 demos de ponta a ponta
-```bash
-./scripts/validate.sh
-```
-Destrói tudo, recria o cluster do zero e executa os comandos de cada cavaleiro, conferindo o par **ataque → defesa**. Falha no primeiro passo que não bater. Verde = as 4 demos funcionam num cluster novo, sem ajustes.
-
-## Precisa de internet?
-
-Só no `./setup.sh` (baixa Calico, Kyverno, ESO, Vault e as imagens). **Depois do setup, as 4 demos rodam offline** — testado com a internet bloqueada:
-
-- as imagens das demos ficam pré-carregadas nos nodes e no registry local;
-- o `cosign sign` usa `--tlog-upload=false` (não envia a assinatura ao Rekor público);
-- a policy do Kyverno usa `rekor.ignoreTlog: true` (não consulta o Rekor na verificação);
-- o `trivy --scanners secret` usa regras embutidas (não baixa banco de dados).
-
----
+Depois do `setup.sh`, **as demos rodam offline**.
 
 ## Estrutura
+
 ```
-setup.sh / teardown.sh      ambiente (kind + Calico + registry + Kyverno/ESO/Vault)
-kind/cluster.yaml           config do cluster (CNI desligado p/ Calico, registry)
-scripts/validate.sh         loop de validação cold-run
-cavaleiro-1-supply-chain/   imagem suspeita, deploy, assinatura e policy
-cavaleiro-2-privileged/     pod privilegiado e Pod Security Standards
-cavaleiro-3-network/        frontend/banco e Network Policies
-cavaleiro-4-secrets/        Secret ingênuo, Vault e External Secrets Operator
+README.md                       você está aqui
+explicacao-4-cavaleiros.html    material de apoio (visão geral)
+roteiros/                       os 4 roteiros de palco (HTML)
+demo/                           tudo que é executável
+  setup.sh · teardown.sh
+  kind/cluster.yaml
+  scripts/validate.sh
+  cavaleiro-1-supply-chain/     imagem suspeita, assinatura e policy
+  cavaleiro-2-privileged/       token de SA, escalada via RBAC
+  cavaleiro-3-network/          frontend → backend → banco e NetworkPolicies
+  cavaleiro-4-secrets/          Secret ingênuo, Vault e External Secrets Operator
 ```
 
-Cada pasta tem um `README.md` com o roteiro: comandos, o que dizer e o resultado esperado.
+## Aviso
 
-## Porta do registry
-O registry local usa a porta **5111** (escolhida para não colidir com a 5000/5001, comuns em outros setups). Para trocar, ajuste `REG_PORT` no `setup.sh` e as referências `:5111` nos arquivos do Cavaleiro 1.
+Tudo aqui é um **laboratório efêmero e local** (kind). As "imagens maliciosas" são **benignas**
+(só imitam atividade suspeita e carregam segredos plantados para o scanner achar) e as credenciais
+são **fictícias**. Vault em dev-mode, registry HTTP e token `root` são apenas para a demo —
+**nada disso vai para produção**.
+
+> O registry local usa a porta **5111** (para não colidir com a 5000/5001). Para trocar, ajuste
+> `REG_PORT` no `demo/setup.sh` e as referências `:5111` nos arquivos do Cavaleiro 1.

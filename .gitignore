@@ -11,3 +11,4 @@ sbom-*.json
 
 # Sistema
 .DS_Store
+.claude/
