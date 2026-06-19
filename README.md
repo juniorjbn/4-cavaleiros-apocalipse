@@ -6,17 +6,17 @@ num cluster local.
 
 | # | Cavaleiro | Ataque | Defesa | Roteiro |
 |---|-----------|--------|--------|---------|
-| I   | Entrar     | Supply chain (imagem não confiável)   | Cosign + SBOM + Kyverno      | [▶](roteiros/cavaleiro-1-supply-chain.html) |
-| II  | Executar   | Token de ServiceAccount + RBAC        | RBAC mínimo                  | [▶](roteiros/cavaleiro-2-privileged.html) |
-| III | Movimentar | Movimentação lateral (rede plana)     | Network Policies (3 camadas) | [▶](roteiros/cavaleiro-3-network.html) |
-| IV  | Roubar     | Secrets em base64                     | Vault + External Secrets     | [▶](roteiros/cavaleiro-4-secrets.html) |
+| I   | Entrar     | Supply chain (imagem não confiável)   | Cosign + SBOM + Kyverno      | [roteiro](roteiros/cavaleiro-1-supply-chain.md) |
+| II  | Executar   | Token de ServiceAccount + RBAC        | RBAC mínimo                  | [roteiro](roteiros/cavaleiro-2-privileged.md) |
+| III | Movimentar | Movimentação lateral (rede plana)     | Network Policies (3 camadas) | [roteiro](roteiros/cavaleiro-3-network.md) |
+| IV  | Roubar     | Secrets em base64                     | Vault + External Secrets     | [roteiro](roteiros/cavaleiro-4-secrets.md) |
 
 ## Material de apoio
 
-- **[explicacao-4-cavaleiros.html](explicacao-4-cavaleiros.html)** — a visão completa de cada cavaleiro: cenários reais, como o ataque funciona, defesa em camadas e as perguntas que a plateia faz.
+- **[explicacao-4-cavaleiros.md](explicacao-4-cavaleiros.md)** — a visão completa de cada cavaleiro: cenários reais, como o ataque funciona, defesa em camadas e as perguntas que a plateia faz.
 - **[roteiros/](roteiros/)** — o roteiro de palco de cada demo, com os comandos prontos para copiar.
 
-> Os arquivos de apoio são **HTML**. No GitHub eles aparecem como código-fonte; para ver renderizado, **clone o repositório e abra no navegador** (ou use a extensão de preview do seu editor).
+> Cada material tem duas versões: o **`.md`** renderiza direto aqui no GitHub; o **`.html`** é a versão de palco (alto contraste, botão de copiar comando) para abrir no navegador durante a apresentação.
 
 ## Rodar as demos
 
@@ -26,7 +26,7 @@ Pré-requisitos: **Docker, kind, kubectl, helm, cosign, trivy** (testado com kin
 cd demo
 ./setup.sh              # cria o cluster kind + Calico + registry e instala Kyverno/ESO/Vault
                         # rode ANTES da palestra (precisa de internet)
-# ... siga os roteiros em roteiros/*.html ...
+# ... siga os roteiros em roteiros/ (no palco, abra os .html no navegador) ...
 ./scripts/validate.sh   # opcional: roda as 4 demos de ponta a ponta (cold-run)
 ./teardown.sh           # derruba o cluster e o registry
 ```
@@ -37,8 +37,9 @@ Depois do `setup.sh`, **as demos rodam offline**.
 
 ```
 README.md                       você está aqui
-explicacao-4-cavaleiros.html    material de apoio (visão geral)
-roteiros/                       os 4 roteiros de palco (HTML)
+explicacao-4-cavaleiros.md      material de apoio — visão geral (renderiza no GitHub)
+explicacao-4-cavaleiros.html    a mesma visão geral, versão de palco (navegador)
+roteiros/                       os 4 roteiros — .md (GitHub) + .html (palco)
 demo/                           tudo que é executável
   setup.sh · teardown.sh
   kind/cluster.yaml
