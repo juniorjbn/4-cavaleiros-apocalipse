@@ -13,6 +13,7 @@ num cluster local.
 
 ## Material de apoio
 
+- **[Slides da apresentação (PDF)](slides/4%20cavaleiros%20do%20apocalipse%20no%20Kubernetes.pdf)** — os slides usados na palestra.
 - **[roteiros/](roteiros/)** — o roteiro de palco de cada demo, com os comandos prontos para copiar.
 
 > Cada roteiro tem duas versões: o **`.md`** renderiza direto aqui no GitHub; o **`.html`** é a versão de palco (alto contraste, botão de copiar comando) para abrir no navegador durante a apresentação.
@@ -36,6 +37,7 @@ Depois do `setup.sh`, **as demos rodam offline**.
 
 ```
 README.md                       você está aqui
+slides/                         PDF dos slides da apresentação
 roteiros/                       os 4 roteiros — .md (GitHub) + .html (palco)
 demo/                           tudo que é executável
   setup.sh · teardown.sh
